@@ -15,9 +15,9 @@
   <body>
     <section>
       <header>
-        <div class="header__date">Fri Jan 14 2022</div>
+        <div class="header__date"></div>
         <div class="header__task">
-          <span class="header__task-count">5 tasks</span>
+          <span class="header__task-count"></span>
           <div class="header__task-state">
             <button class="all select">All</button>
             <button class="active">Active</button>
@@ -25,49 +25,10 @@
           </div>
         </div>
       </header>
-      <input class="input-add" type="text" placeholder="Add a new task..." />
-      <ul class="items">
-        <li class="item">
-          <div class="item__left">
-            <input class="item__check" id="cb1" type="checkbox" />
-            <label for="cb1"><i class="fas fa-check"></i></label>
-            <span class="item__name">Morning walk</span>
-          </div>
-          <button class="item__delete">
-            <i class="far fa-times-circle"></i>
-          </button>
-        </li>
-        <li class="item">
-          <div class="item__left">
-            <input class="item__check" id="cb2" type="checkbox" />
-            <label for="cb2"><i class="fas fa-check"></i></label>
-            <span class="item__name">Morning walk</span>
-          </div>
-          <button class="item__delete">
-            <i class="far fa-times-circle"></i>
-          </button>
-        </li>
-        <li class="item">
-          <div class="item__left">
-            <input class="item__check" id="cb3" type="checkbox" />
-            <label for="cb3"><i class="fas fa-check"></i></label>
-            <span class="item__name">Morning walk</span>
-          </div>
-          <button class="item__delete">
-            <i class="far fa-times-circle"></i>
-          </button>
-        </li>
-        <li class="item">
-          <div class="item__left">
-            <input class="item__check" id="cb4" type="checkbox" />
-            <label for="cb4"><i class="fas fa-check"></i></label>
-            <span class="item__name">Morning walk</span>
-          </div>
-          <button class="item__delete">
-            <i class="far fa-times-circle"></i>
-          </button>
-        </li>
-      </ul>
+      <form>
+        <input class="input-add" type="text" placeholder="Add a new task..." />
+      </form>
+      <ul class="items"></ul>
     </section>
   </body>
 </html>
