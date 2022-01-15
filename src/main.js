@@ -1,15 +1,59 @@
+"use strict";
+
+import Today from "./updateDate.js";
+
 const addForm = document.querySelector("form");
 const input = document.querySelector(".input-add");
 const items = document.querySelector(".items");
-const todaysDate = document.querySelector(".header__date");
 const itemCount = document.querySelector(".header__task-count");
 const todosList = document.querySelector(".items");
 const allBtn = document.querySelector(".all");
 const activeBtn = document.querySelector(".active");
 const completedBtn = document.querySelector(".completed");
+const buttons = document.querySelector(".header__task-state");
+
+const CLASS_SELECT = "select";
+const CLASS_HIDDEN = "hidden";
 
 let todosArray = [];
 let checkedArray = [];
+
+buttons.addEventListener("click", (event) => {
+  const buttonClassName = event.target.className;
+  if (buttonClassName === "active") {
+    selectClassHandler(activeBtn, allBtn, completedBtn);
+    hiddenClassHandler(todosArray, "remove");
+    hiddenClassHandler(checkedArray, "add");
+  } else if (buttonClassName === "completed") {
+    selectClassHandler(completedBtn, activeBtn, allBtn);
+    hiddenClassHandler(todosArray, "add");
+    hiddenClassHandler(checkedArray, "remove");
+  } else if (buttonClassName === "all") {
+    selectClassHandler(allBtn, activeBtn, completedBtn);
+    hiddenClassHandler(todosArray, "remove");
+  }
+});
+
+function selectClassHandler(addBtn, removeBtn1, removeBtn2) {
+  addBtn.classList.add(CLASS_SELECT);
+  removeBtn1.classList.remove(CLASS_SELECT);
+  removeBtn2.classList.remove(CLASS_SELECT);
+}
+
+function hiddenClassHandler(array, action) {
+  array.forEach((todo) => {
+    const todoList = document.querySelector(`.item[data-id='${todo.id}']`);
+    if (action === "remove") {
+      todoList.classList.remove(CLASS_HIDDEN);
+    } else if (action === "add") {
+      todoList.classList.add(CLASS_HIDDEN);
+    }
+  });
+}
+
+const date = new Today();
+date.update();
+setInterval(date.update, 1000);
 
 function uploadStorage() {
   localStorage.setItem("todos", JSON.stringify(todosArray));
@@ -42,7 +86,7 @@ function createHTML(todoObj) {
     <div class="item__left">
       <input class="item__check" id="cb${todoObj.id}" type="checkbox" />
       <label for="cb${todoObj.id}"><i class="fas fa-check" data-id="${todoObj.id}"></i></label>  
-      <span class="item__name">${todoObj.name}</span>
+      <span class="item__name" data-id="${todoObj.id}">${todoObj.name}</span>
     </div>
     <button class="item__delete">
       <i class="far fa-times-circle" data-id="${todoObj.id}"></i>
@@ -56,11 +100,22 @@ function onTodosListHandler(event) {
   if (itemType.className === "fas fa-check") {
     // check
     const id = itemType.dataset.id;
-    if (checkedArray.indexOf(id) === -1) {
-      checkedArray.push(id);
-    } else {
-      const index = checkedArray.indexOf(id);
+    const itemName = document.querySelector(
+      `.item__name[data-id='${id}']`
+    ).innerText;
+    const itemObj = {
+      name: itemName,
+      id: id,
+    };
+    if (
+      checkedArray.some(
+        (item) => JSON.stringify(item) === JSON.stringify(itemObj)
+      )
+    ) {
+      const index = checkedArray.findIndex((item) => item.id === id);
       checkedArray.splice(index, 1);
+    } else {
+      checkedArray.push(itemObj);
     }
 
     uploadStorage();
@@ -70,7 +125,7 @@ function onTodosListHandler(event) {
     const deleteTodo = document.querySelector(`.item[data-id='${id}']`);
     deleteTodo.remove();
     todosArray = todosArray.filter((todo) => todo.id !== +id);
-    checkedArray = checkedArray.filter((todo) => +todo !== +id);
+    checkedArray = checkedArray.filter((todo) => +todo.id !== +id);
     updateTaskCount();
     uploadStorage();
   }
@@ -84,53 +139,8 @@ function updateTaskCount() {
   }
 }
 
-function onAllBtnHandler() {
-  allBtn.classList.add("select");
-  activeBtn.classList.remove("select");
-  completedBtn.classList.remove("select");
-  todosArray.forEach((todo) => {
-    const todoItem = document.querySelector(`.item[data-id='${todo.id}']`);
-    todoItem.classList.remove("hidden");
-  });
-}
-
-function onActiveBtnHandler() {
-  allBtn.classList.remove("select");
-  activeBtn.classList.add("select");
-  completedBtn.classList.remove("select");
-  todosArray.forEach((todo) => {
-    const todoItem = document.querySelector(`.item[data-id='${todo.id}']`);
-    todoItem.classList.remove("hidden");
-  });
-  checkedArray.forEach((completedId) => {
-    const completedItem = document.querySelector(
-      `.item[data-id='${completedId}']`
-    );
-    completedItem.classList.add("hidden");
-  });
-}
-
-function onCompletedBtnHandler() {
-  allBtn.classList.remove("select");
-  activeBtn.classList.remove("select");
-  completedBtn.classList.add("select");
-  todosArray.forEach((todo) => {
-    const todoItem = document.querySelector(`.item[data-id='${todo.id}']`);
-    todoItem.classList.add("hidden");
-  });
-  checkedArray.forEach((completedId) => {
-    const completedItem = document.querySelector(
-      `.item[data-id='${completedId}']`
-    );
-    completedItem.classList.remove("hidden");
-  });
-}
-
 addForm.addEventListener("submit", onSubmitHandler);
 todosList.addEventListener("click", onTodosListHandler);
-allBtn.addEventListener("click", onAllBtnHandler);
-activeBtn.addEventListener("click", onActiveBtnHandler);
-completedBtn.addEventListener("click", onCompletedBtnHandler);
 
 const savedTodos = localStorage.getItem("todos");
 const savedChecked = localStorage.getItem("checked");
@@ -144,85 +154,8 @@ if (savedTodos) {
 if (savedChecked) {
   const parsedSavedChecked = JSON.parse(savedChecked);
   checkedArray = parsedSavedChecked;
-  parsedSavedChecked.forEach((checkedId) => {
-    const checkTodo = document.querySelector(`#cb${checkedId}`);
+  parsedSavedChecked.forEach((checkedTodo) => {
+    const checkTodo = document.querySelector(`#cb${checkedTodo.id}`);
     checkTodo.checked = true;
   });
 }
-
-function updateDate() {
-  const today = new Date();
-  const day = today.getDay();
-  const month = today.getMonth();
-  const date = today.getDate();
-  const year = today.getFullYear();
-
-  let dayInLetter;
-  let monthInLetter;
-  switch (day) {
-    case 0:
-      dayInLetter = "Sun";
-      break;
-    case 1:
-      dayInLetter = "Mon";
-      break;
-    case 2:
-      dayInLetter = "Tue";
-      break;
-    case 3:
-      dayInLetter = "Wed";
-      break;
-    case 4:
-      dayInLetter = "Thu";
-      break;
-    case 5:
-      dayInLetter = "Fri";
-      break;
-    case 6:
-      dayInLetter = "Sat";
-      break;
-  }
-
-  switch (month) {
-    case 0:
-      monthInLetter = "Jan";
-      break;
-    case 1:
-      monthInLetter = "Feb";
-      break;
-    case 2:
-      monthInLetter = "Mar";
-      break;
-    case 3:
-      monthInLetter = "Apr";
-      break;
-    case 4:
-      monthInLetter = "May";
-      break;
-    case 5:
-      monthInLetter = "June";
-      break;
-    case 6:
-      monthInLetter = "July";
-      break;
-    case 7:
-      monthInLetter = "Aug";
-      break;
-    case 8:
-      monthInLetter = "Sep";
-      break;
-    case 9:
-      monthInLetter = "Oct";
-      break;
-    case 10:
-      monthInLetter = "Nov";
-      break;
-    case 11:
-      monthInLetter = "Dec";
-      break;
-  }
-  todaysDate.innerText = `${dayInLetter} ${monthInLetter} ${date} ${year}`;
-}
-
-updateDate();
-setInterval(updateDate, 1000);
