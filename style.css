@@ -93,6 +93,7 @@ section {
   width: 96.8%;
   padding: var(--base-space);
   border-bottom: 2px solid var(--color-more-light-grey);
+  background-color: var(--color-white);
 }
 
 .items {
@@ -158,4 +159,19 @@ label {
 
 .item__delete {
   color: var(--color-light-grey);
+}
+
+@media screen and (max-width: 700px), (max-height: 420px) {
+  body {
+    background-color: var(--color-white);
+  }
+  section {
+    width: 100vw;
+    height: 100vh;
+    border-radius: 0;
+    -webkit-box-shadow: none;
+    -moz-box-shadow: none;
+    box-shadow: none;
+    padding-top: 60px;
+  }
 }
