@@ -1,6 +1,7 @@
 # todolist-js
 
-<img src="./mobile"  width="800"/>
+<img src="./web.gif"  width="600" height="400"/>
+<img src="./mobile.gif"  width="300" height="600"/>
 
 ## Stack
 * HTML
